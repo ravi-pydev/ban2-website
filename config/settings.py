@@ -31,8 +31,12 @@ SECRET_KEY = 'django-insecure-wfs13olt8#=-#bcs%^2lbv^$0uj5_ip^x$x^3z_l0lqxw6!wq6
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+# ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    " 192.168.1.43",
+]
 
 # Application definition
 
@@ -82,14 +86,36 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
-# SQLite for now; switch to 'django.db.backends.mysql' (with mysqlclient) later.
+# MySQL when DB_NAME is set in .env, otherwise a local SQLite file.
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if os.environ.get('DB_NAME'):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ['DB_NAME'],
+            'USER': os.environ.get('DB_USER', 'root'),
+            'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+            'HOST': os.environ.get('DB_HOST', '127.0.0.1'),
+            'PORT': os.environ.get('DB_PORT', '3306'),
+            'OPTIONS': {
+                'charset': 'utf8mb4',
+                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            },
+            'TEST': {
+                'CHARSET': 'utf8mb4',
+                'COLLATION': 'utf8mb4_unicode_ci',
+            },
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+    # Column comments (db_comment) are stored by MySQL; SQLite just ignores them.
+    SILENCED_SYSTEM_CHECKS = ['fields.W163']
 
 
 # Password validation
@@ -129,10 +155,13 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# The frontend (frontend/) is plain HTML/JS. WhiteNoise serves it at the site
-# root, so /about/ maps to frontend/about/index.html.
-WHITENOISE_ROOT = BASE_DIR / 'frontend'
-WHITENOISE_INDEX_FILE = True
+# The React frontend is built into frontend/dist (`npm run build`).
+# WhiteNoise serves its files (/assets/…) at the site root; page URLs like
+# /about/ are answered by homepage.views.frontend with dist/index.html.
+FRONTEND_DIST = BASE_DIR / 'frontend' / 'dist'
+if FRONTEND_DIST.is_dir():
+    WHITENOISE_ROOT = FRONTEND_DIST
+    WHITENOISE_INDEX_FILE = True
 
 # WhiteNoise serves the collected static files (run `make collectstatic` first).
 STORAGES = {
@@ -194,8 +223,8 @@ REST_FRAMEWORK = {
     },
 }
 
-# Origins allowed to call the API from a different host/port, e.g. the
-# frontend dev server (`make frontend`). Comma-separated in .env.
+# Origins allowed to call the API from a different host/port. Not needed for
+# the React dev server, which proxies /api to Django. Comma-separated in .env.
 CORS_ALLOWED_ORIGINS = os.environ.get(
     'CORS_ALLOWED_ORIGINS', 'http://127.0.0.1:5500,http://localhost:5500'
 ).split(',')

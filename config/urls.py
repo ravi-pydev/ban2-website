@@ -15,9 +15,13 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, re_path
+
+from homepage.views import frontend
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('homepage.urls')),
+    # Every other page URL loads the React app, which handles routing itself.
+    re_path(r'^(?!api/|admin/|static/).*$', frontend, name='frontend'),
 ]
