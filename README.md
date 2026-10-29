@@ -1,37 +1,85 @@
-# Ban2 Website
+# Ban2Plans
 
-The Ban2 website, built with Django.
+Website for Ban2Plans, Shashi Darshan's event planning and hospitality services business.
+
+The project has two parts:
+
+- **Backend:** a Django REST Framework API (`/api/…`) that serves the site content and handles enquiries.
+- **Frontend:** plain HTML, CSS and JavaScript in `frontend/`, with no build step. It fetches everything from the API.
 
 ## Tech stack
 
-- Python 3.14
-- Django 6.1
+- Python 3.14, Django 6.1, Django REST Framework
+- django-cors-headers (lets the frontend call the API from another host or port)
+- WhiteNoise (serves the frontend and static files)
 - SQLite for development (MySQL will replace it later; see [Switching to MySQL](#switching-to-mysql))
 
 ## Project structure
 
 ```
 ban2-website/
-├── config/                 # Project settings and root URL configuration
-│   ├── settings.py
-│   ├── urls.py
-│   ├── asgi.py
-│   └── wsgi.py
-├── homepage/               # Homepage app
-│   ├── migrations/
-│   ├── templates/homepage/
-│   │   └── index.html
-│   ├── admin.py
-│   ├── apps.py
-│   ├── models.py
+├── config/                     # Settings and root URLs (/admin/, /api/)
+├── homepage/                   # API app
+│   ├── content.py              # ALL site text: services, resume, FAQs…
+│   ├── serializers.py          # Enquiry validation
+│   ├── views.py                # API views
+│   ├── urls.py                 # /api/ routes
 │   ├── tests.py
-│   ├── urls.py
-│   └── views.py
+│   ├── static/homepage/img/    # Photos (served at /static/…)
+│   └── templates/homepage/email/enquiry.txt
+├── frontend/                   # Website (static HTML/JS)
+│   ├── index.html              # Home page  → /
+│   ├── about/index.html        # About page → /about/
+│   └── assets/
+│       ├── css/style.css
+│       └── js/
+│           ├── config.js       # API base URL
+│           ├── app.js          # Shared: API calls, header/footer, icons
+│           ├── home.js         # Home page rendering + enquiry form
+│           └── about.js        # About page rendering
 ├── manage.py
 ├── Makefile
 ├── requirements.txt
+├── .env.example
 └── .gitignore
 ```
+
+## API
+
+| Method | Endpoint | Returns |
+|---|---|---|
+| GET | `/api/` | List of endpoints |
+| GET | `/api/site/` | Site name, WhatsApp number, profile (name, photo, email…) |
+| GET | `/api/home/` | Home page content: hero, stats, services, sessions, testimonials, FAQs… |
+| GET | `/api/about/` | Resume: experience, highlights, education, skills, languages, interests |
+| GET | `/api/enquiries/` | Allowed `event_type` values |
+| POST | `/api/enquiries/` | Submit an enquiry (JSON or form data). `201` on success, `400` with `errors` if invalid, `429` if rate-limited (30 per hour per visitor) |
+
+Image fields in the responses are full URLs. Open any endpoint in a browser to use DRF's browsable API.
+
+Example enquiry:
+
+```json
+POST /api/enquiries/
+{
+  "name": "Priya Sharma",
+  "email": "priya@example.com",
+  "phone": "+91 9800000010",
+  "company": "Acme Technologies",
+  "event_type": "Corporate Events & Conferences",
+  "guests": 120,
+  "date": "2026-12-15",
+  "message": "Annual sales meet in Gurugram."
+}
+```
+
+To change any text on the site, edit `homepage/content.py`. The API and pages pick it up automatically.
+
+## Running the site
+
+**One server (simplest, and how production works):** `make run`. Django serves the frontend at http://127.0.0.1:8000 and the API at `/api/`.
+
+**Separate frontend server:** run `make run` (API on port 8000) and, in a second terminal, `make frontend` (frontend on http://127.0.0.1:5500). `frontend/assets/js/config.js` points the frontend at the API on port 8000. To allow other frontend addresses, set `CORS_ALLOWED_ORIGINS` in `.env`.
 
 ## Getting started
 
@@ -97,8 +145,35 @@ Run `make help` to see every command.
 
 | Path | Description |
 |---|---|
-| `/` | Homepage |
+| `/` | Home – services, organised events, testimonials, FAQ and enquiry form (`frontend/index.html`) |
+| `/about/` | About Me – resume (`frontend/about/index.html`) |
+| `/api/` | REST API (see [API](#api)) |
 | `/admin/` | Django admin (run `make superuser` first to create a login) |
+
+## Enquiry form (email + WhatsApp)
+
+Clicking **Send enquiry** on the home page does two things:
+
+1. **WhatsApp** opens with the enquiry pre-written to the number in `WHATSAPP_NUMBER` (`homepage/content.py`). The visitor taps Send. The message text is built in `frontend/assets/js/home.js`.
+2. **Email:** the form POSTs to `/api/enquiries/`, and the server emails `ENQUIRY_EMAIL_TO` with Reply-To set to the visitor's address.
+
+The email format is in `homepage/templates/homepage/email/enquiry.txt`.
+
+### Email setup (Gmail)
+
+1. Turn on 2-Step Verification for the Gmail account the site will send from.
+2. Create an App password at https://myaccount.google.com/apppasswords.
+3. Copy `.env.example` to `.env` and fill in:
+
+   ```
+   EMAIL_HOST_USER=your.sender@gmail.com
+   EMAIL_HOST_PASSWORD=your16charapppassword
+   ENQUIRY_EMAIL_TO=ravidarshan95@gmail.com
+   ```
+
+4. Restart the server.
+
+Without `EMAIL_HOST_USER` in `.env`, emails are printed to the terminal instead of being sent, which is handy for development.
 
 ## Switching to MySQL
 
@@ -151,7 +226,7 @@ Before serving in production:
 
 - Set `DEBUG = False` and add your domain to `ALLOWED_HOSTS` in `config/settings.py`.
 - Replace `SECRET_KEY` with a secret value that is kept out of git.
-- Run `make collectstatic`, and serve the collected `staticfiles/` with a web server such as Nginx or IIS. Waitress does not serve static files, so CSS (including the admin's) will be missing without this.
+- Run `make collectstatic` after every change to CSS, JS or images. [WhiteNoise](https://whitenoise.readthedocs.io/) then serves the collected `staticfiles/` folder directly from Django, so no separate web server is needed for static files.
 
 ## Notes
 

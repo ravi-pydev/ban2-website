@@ -17,7 +17,7 @@ HOST ?= 127.0.0.1
 PORT ?= 8000
 
 .DEFAULT_GOAL := help
-.PHONY: help venv install setup run serve migrations migrate superuser shell check test collectstatic freeze
+.PHONY: help venv install setup run serve frontend migrations migrate superuser shell check test collectstatic freeze
 
 help:
 	@echo Available targets:
@@ -26,6 +26,7 @@ help:
 	@echo   setup          venv + install + migrate
 	@echo   run            Start dev server [HOST=$(HOST) PORT=$(PORT)]
 	@echo   serve          Start production server - Waitress [HOST=$(HOST) PORT=$(PORT)]
+	@echo   frontend       Serve frontend/ alone on port 5500 (API must run on 8000)
 	@echo   migrations     Create new migrations [app=name optional]
 	@echo   migrate        Apply migrations
 	@echo   superuser      Create an admin superuser
@@ -49,6 +50,9 @@ run:
 
 serve:
 	$(VENV_BIN)/waitress-serve --host=$(HOST) --port=$(PORT) config.wsgi:application
+
+frontend:
+	$(PYTHON) -m http.server 5500 --bind 127.0.0.1 --directory frontend
 
 migrations:
 	$(MANAGE) makemigrations $(app)
