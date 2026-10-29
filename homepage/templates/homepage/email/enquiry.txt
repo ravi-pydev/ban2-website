@@ -1,0 +1,24 @@
+{% autoescape off %}Hello Shashi,
+
+You have a new event enquiry from the Ban2Plans website.
+
+──────────────────────────────
+ENQUIRY DETAILS
+──────────────────────────────
+Name            : {{ e.name }}
+Company         : {{ e.company|default:"–" }}
+Email           : {{ e.email }}
+Phone/WhatsApp  : {{ e.phone|default:"–" }}
+Event type      : {{ e.event_type }}
+Guests          : {{ e.guests|default:"–" }}
+Preferred date  : {% if e.date %}{{ e.date|date:"j M Y" }}{% else %}–{% endif %}
+
+Details:
+{{ e.message|default:"–" }}
+──────────────────────────────
+
+Reply to this email to respond to {{ e.name }} directly.
+
+— Ban2Plans website
+Received: {{ received|date:"j M Y, g:i A" }}
+{% endautoescape %}
