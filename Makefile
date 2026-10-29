@@ -1,4 +1,4 @@
-# Ban2 Website - common development commands
+# Event & Experience by Ban2 - common development commands
 # Usage: make <target>   (run `make help` to list targets)
 
 ifeq ($(OS),Windows_NT)
@@ -17,14 +17,14 @@ HOST ?= 127.0.0.1
 PORT ?= 8000
 
 .DEFAULT_GOAL := help
-.PHONY: help venv install setup run serve frontend frontend-install frontend-build seed migrations migrate superuser shell check test collectstatic freeze
+.PHONY: help venv install setup run server serve frontend frontend-install frontend-build seed migrations migrate superuser shell check test collectstatic freeze
 
 help:
 	@echo Available targets:
 	@echo   venv              Create the virtual environment
 	@echo   install           Install Python dependencies from requirements.txt
 	@echo   setup             venv + install + migrate + seed + frontend-install + frontend-build
-	@echo   run               Start Django dev server [HOST=$(HOST) PORT=$(PORT)]
+	@echo   run / server      Start Django dev server [HOST=$(HOST) PORT=$(PORT)]
 	@echo   serve             Start production server - Waitress [HOST=$(HOST) PORT=$(PORT)]
 	@echo   frontend          Start React dev server on http://localhost:5173 (needs `make run`)
 	@echo   frontend-install  Install React dependencies (npm install)
@@ -50,6 +50,8 @@ setup: venv install migrate seed frontend-install frontend-build
 
 run:
 	$(MANAGE) runserver $(HOST):$(PORT)
+
+server: run
 
 serve:
 	$(VENV_BIN)/waitress-serve --host=$(HOST) --port=$(PORT) config.wsgi:application

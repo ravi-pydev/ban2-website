@@ -62,7 +62,7 @@ class EventSessionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.EventSession
-        fields = ['title', 'image', 'text']
+        fields = ['id', 'title', 'image', 'text']
 
 
 class SellingPointSerializer(serializers.ModelSerializer):
@@ -96,6 +96,19 @@ class TestimonialSerializer(serializers.ModelSerializer):
     def get_sample(self, obj):
         # Without the client's consent the quote is treated as a placeholder.
         return not obj.consent_given
+
+
+class ReviewSerializer(TestimonialSerializer):
+    """A testimonial in the reviews list, with the event and date."""
+
+    event = serializers.CharField(source='event_session.title', default='')
+    date = serializers.SerializerMethodField()
+
+    class Meta(TestimonialSerializer.Meta):
+        fields = TestimonialSerializer.Meta.fields + ['event', 'date']
+
+    def get_date(self, obj):
+        return month_year(obj.received_on)
 
 
 class FaqSerializer(serializers.ModelSerializer):
@@ -185,6 +198,7 @@ class EnquirySerializer(serializers.Serializer):
     event_type = serializers.ChoiceField(choices=[])
     guests = serializers.IntegerField(min_value=1, max_value=100000, required=False, allow_null=True)
     date = serializers.DateField(required=False, allow_null=True)
+    event_location = serializers.CharField(max_length=150, required=False, allow_blank=True)
     message = serializers.CharField(max_length=3000, required=False, allow_blank=True)
     # Honeypot: hidden from people, bots tend to fill it in.
     website = serializers.CharField(required=False, allow_blank=True)
@@ -199,6 +213,34 @@ class EnquirySerializer(serializers.Serializer):
         if hasattr(data, 'dict'):
             data = data.dict()
         data = {k: (None if k in ('guests', 'date') and v == '' else v) for k, v in data.items()}
+        return super().to_internal_value(data)
+
+    @property
+    def is_spam(self):
+        return bool(self.validated_data.get('website'))
+
+
+class FeedbackSerializer(serializers.Serializer):
+    """Feedback from an existing client, submitted on the website."""
+
+    name = serializers.CharField(max_length=100)
+    email = serializers.EmailField()
+    company = serializers.CharField(max_length=150, required=False, allow_blank=True)
+    role = serializers.CharField(max_length=100, required=False, allow_blank=True)
+    event_session = serializers.PrimaryKeyRelatedField(
+        queryset=models.EventSession.objects.filter(is_published=True),
+        required=False, allow_null=True)
+    rating = serializers.IntegerField(min_value=1, max_value=5)
+    feedback = serializers.CharField(min_length=20, max_length=1000)
+    consent = serializers.BooleanField(default=False)
+    # Honeypot: hidden from people, bots tend to fill it in.
+    website = serializers.CharField(required=False, allow_blank=True)
+
+    def to_internal_value(self, data):
+        if hasattr(data, 'dict'):
+            data = data.dict()
+        if data.get('event_session') == '':
+            data = dict(data, event_session=None)
         return super().to_internal_value(data)
 
     @property

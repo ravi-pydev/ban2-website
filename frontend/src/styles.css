@@ -1446,6 +1446,39 @@ a.contact-card:hover { transform: translateY(-4px); border-color: var(--gold); }
 }
 
 .enquiry textarea { resize: vertical; }
+
+.other-details { display: grid; gap: 10px; }
+
+.details-toggle {
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--gold-dark);
+    cursor: pointer;
+}
+
+.details-toggle span {
+    display: grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--gold-light);
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.details-toggle:hover { color: var(--navy); }
+.details-toggle:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 4px; }
+
+.enquiry textarea[hidden] { display: none; }
 .enquiry .btn { border: 0; cursor: pointer; justify-self: start; }
 .form-note { font-size: 0.8rem; color: var(--muted); }
 .enquiry .btn:disabled { opacity: 0.7; cursor: wait; transform: none; }
@@ -1464,6 +1497,587 @@ a.contact-card:hover { transform: translateY(-4px); border-color: var(--gold); }
 
 @media (prefers-reduced-motion: reduce) {
     .ribbon-track { animation: none; }
+}
+
+/* ===================================================================
+   Client reviews + feedback form
+   =================================================================== */
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+.stars { display: inline-flex; gap: 2px; letter-spacing: 0; }
+.stars .on { color: var(--gold); }
+.stars .off { color: var(--line); }
+.stars-lg { font-size: 1.5rem; }
+.testimonial .stars { margin: 14px 0 10px; }
+
+.reviews-layout {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 40px;
+    align-items: start;
+}
+
+.review-summary {
+    position: sticky;
+    top: 96px;
+    display: grid;
+    justify-items: center;
+    gap: 6px;
+    padding: 32px 28px;
+    border-radius: var(--radius);
+    background: var(--white);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+    text-align: center;
+}
+
+.review-average {
+    font-family: var(--serif);
+    font-size: 4rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--navy);
+}
+
+.review-count { font-size: 0.9rem; color: var(--muted); margin-bottom: 14px; }
+
+.review-bars { width: 100%; display: grid; gap: 8px; margin-bottom: 22px; }
+
+.review-bars li {
+    display: grid;
+    grid-template-columns: 30px 1fr 24px;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+    color: var(--muted);
+}
+
+.review-bars .bar {
+    height: 8px;
+    border-radius: 999px;
+    background: var(--line);
+    overflow: hidden;
+}
+
+.review-bars .bar span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--gold-dark), var(--gold));
+}
+
+.review-list { display: grid; gap: 16px; margin-bottom: 22px; }
+
+.review-item {
+    padding: 22px 24px;
+    border-radius: var(--radius);
+    background: var(--white);
+    border: 1px solid var(--line);
+    transition: box-shadow 0.3s, border-color 0.3s;
+}
+
+.review-item:hover { box-shadow: var(--shadow); border-color: rgba(195, 154, 79, 0.45); }
+
+.review-head {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.review-head strong { display: block; color: var(--navy); }
+.review-head small { color: var(--muted); }
+.review-item p { color: var(--ink); }
+
+.review-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 16px;
+    margin-top: 12px;
+    font-size: 0.8rem;
+    color: var(--muted);
+}
+
+.review-meta .sample-tag { position: static; }
+
+.btn-ghost-dark {
+    border: 1px solid var(--navy);
+    background: transparent;
+    color: var(--navy);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-ghost-dark:hover { background: var(--navy); color: var(--white); }
+
+.feedback-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 64px;
+    align-items: start;
+}
+
+.checklist-single { grid-template-columns: 1fr; }
+
+.feedback-form { box-shadow: var(--shadow-lg); border: 1px solid var(--line); }
+
+.star-input { border: 0; padding: 0; margin: 0; }
+
+.star-input legend {
+    margin-bottom: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--navy);
+}
+
+.star-row { display: flex; align-items: center; gap: 4px; }
+
+.star-row label {
+    position: relative;
+    display: block;
+    font-size: 2rem;
+    line-height: 1;
+    color: var(--line);
+    cursor: pointer;
+    transition: color 0.15s, transform 0.15s;
+}
+
+.star-row label.on { color: var(--gold); }
+.star-row label:hover { transform: scale(1.12); }
+
+.star-row input {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    cursor: pointer;
+}
+
+.star-row label:has(input:focus-visible) { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 4px; }
+
+.star-label { margin-left: 10px; font-size: 0.9rem; font-weight: 500; color: var(--muted); }
+
+.enquiry label.checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-weight: 400;
+    color: var(--muted);
+}
+
+.enquiry label.checkbox input { width: auto; margin-top: 4px; accent-color: var(--gold-dark); }
+
+@media (max-width: 960px) {
+    .reviews-layout, .feedback-grid { grid-template-columns: 1fr; gap: 32px; }
+    .review-summary { position: static; }
+}
+
+@media (max-width: 640px) {
+    .review-head { grid-template-columns: auto 1fr; }
+    .review-head .stars { grid-column: 1 / -1; }
+}
+
+/* ===================================================================
+   Popups (enquiry + feedback)
+   =================================================================== */
+
+/* Buttons that replaced links keep the link/button look */
+button.btn { font: inherit; font-weight: 600; cursor: pointer; }
+button.btn-primary { border: 0; }
+button.text-link, button.nav-cta {
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    cursor: pointer;
+}
+button.text-link { font-weight: 600; color: var(--gold-dark); }
+button.nav-cta { padding: 8px 20px; border: 1px solid var(--gold); border-radius: 999px; font-size: 0.9rem; font-weight: 500; }
+
+body:has(.site-modal[open]) { overflow: hidden; }
+
+.site-modal {
+    width: min(680px, calc(100% - 32px));
+    max-height: calc(100vh - 48px);
+    margin: auto;
+    padding: 0;
+    border: 0;
+    border-radius: 22px;
+    background: var(--white);
+    color: var(--ink);
+    box-shadow: 0 30px 80px rgba(8, 15, 31, 0.45);
+    overflow: auto;
+}
+
+.site-modal[open] { animation: modal-in 0.3s var(--ease); }
+
+.site-modal::backdrop {
+    background: rgba(8, 15, 31, 0.65);
+    backdrop-filter: blur(4px);
+}
+
+@keyframes modal-in {
+    from { opacity: 0; transform: translateY(16px) scale(0.98); }
+}
+
+.modal-header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 26px 32px 18px;
+    background: var(--white);
+    border-bottom: 1px solid var(--line);
+}
+
+.modal-header .kicker { margin-bottom: 2px; }
+
+.modal-header h2 {
+    font-family: var(--serif);
+    font-size: 1.9rem;
+    line-height: 1.15;
+    color: var(--navy);
+}
+
+.modal-close {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: var(--bg);
+    color: var(--navy);
+    font-size: 1.6rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.modal-close:hover { background: var(--navy); color: var(--white); }
+
+.site-modal .enquiry {
+    padding: 24px 32px 30px;
+    box-shadow: none;
+    border-radius: 0;
+}
+
+.modal-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 60px 0;
+    color: var(--muted);
+}
+
+.modal-loading span {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 3px solid var(--gold-light);
+    border-top-color: var(--gold);
+    animation: spin 0.8s linear infinite;
+}
+
+.modal-message { margin: 24px 32px; }
+
+.site-modal .feedback-form { border: 0; }
+
+/* Feedback call-to-action card (the form now lives in the popup) */
+.feedback-cta {
+    display: grid;
+    gap: 24px;
+    justify-items: start;
+    padding: 32px;
+    border-radius: 20px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+}
+
+.feedback-cta .checklist { margin: 0; }
+.feedback-cta .btn-lg { margin-top: 0; }
+
+button.footer-link {
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+}
+
+button.footer-link:hover { color: var(--gold); }
+
+.footer-contact li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.footer-contact svg {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    color: var(--gold);
+}
+
+.footer-contact a { overflow-wrap: anywhere; }
+
+/* ===================================================================
+   Reviews page
+   =================================================================== */
+
+.page-hero {
+    position: relative;
+    overflow: hidden;
+    padding: 150px 0 70px;
+    color: var(--white);
+    text-align: center;
+    background:
+        radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.06) 1px, transparent 0) 0 0 / 28px 28px,
+        linear-gradient(140deg, var(--navy-deep) 0%, var(--navy) 50%, var(--navy-soft) 100%);
+}
+
+.page-hero h1 {
+    font-family: var(--serif);
+    font-size: clamp(2.6rem, 6vw, 4rem);
+    line-height: 1.05;
+}
+
+.page-hero-text {
+    max-width: 56ch;
+    margin: 16px auto 0;
+    color: rgba(255, 255, 255, 0.78);
+}
+
+.page-hero-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 28px;
+    padding: 12px 24px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.page-hero-rating strong { font-family: var(--serif); font-size: 2rem; line-height: 1; color: var(--gold); }
+.page-hero-rating > span:last-child { color: rgba(255, 255, 255, 0.75); font-size: 0.9rem; }
+.page-hero-rating .stars .off { color: rgba(255, 255, 255, 0.25); }
+
+.review-filters { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+
+.review-filters button { font: inherit; font-size: 0.9rem; cursor: pointer; }
+.review-filters button:disabled { opacity: 0.4; cursor: default; transform: none; }
+.filter-count { margin-left: 4px; opacity: 0.65; font-size: 0.8rem; }
+
+.review-showing { margin-bottom: 16px; font-size: 0.85rem; color: var(--muted); }
+
+.bar-filter {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: 30px 1fr 24px;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 4px 6px;
+    margin: -4px -6px;
+    border: 0;
+    border-radius: 8px;
+    background: none;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+}
+
+.bar-filter:hover:not(:disabled), .bar-filter.active { background: var(--gold-light); }
+.bar-filter:disabled { cursor: default; }
+
+.reviews-empty { display: grid; justify-items: center; gap: 18px; text-align: center; }
+
+
+@media (max-width: 860px) {
+    .page-hero { padding: 120px 0 56px; }
+}
+
+/* ===================================================================
+   Carousel (Happy Clients)
+   =================================================================== */
+
+.carousel { position: relative; }
+
+.carousel-track {
+    display: flex;
+    gap: 24px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    padding: 10px 4px 18px;
+    margin: 0 -4px;
+}
+
+.carousel-track::-webkit-scrollbar { display: none; }
+
+.carousel-slide {
+    flex: 0 0 calc((100% - 48px) / 3);
+    display: flex;
+    scroll-snap-align: start;
+}
+
+.carousel-slide > .testimonial { width: 100%; }
+
+.carousel-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    margin-top: 18px;
+}
+
+.carousel-arrow {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: var(--white);
+    color: var(--navy);
+    font-size: 1.6rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, opacity 0.2s;
+}
+
+.carousel-arrow:hover:not(:disabled) { background: var(--navy); border-color: var(--navy); color: var(--white); }
+.carousel-arrow:disabled { opacity: 0.35; cursor: default; }
+
+.carousel-dots { display: flex; gap: 8px; }
+
+.carousel-dots button {
+    width: 10px;
+    height: 10px;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: var(--line);
+    cursor: pointer;
+    transition: width 0.3s var(--ease), background 0.3s;
+}
+
+.carousel-dots button.active { width: 28px; background: var(--gold); }
+
+.carousel-arrow:focus-visible, .carousel-dots button:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+
+@media (max-width: 960px) {
+    .carousel-slide { flex-basis: calc((100% - 24px) / 2); }
+}
+
+@media (max-width: 640px) {
+    .carousel-slide { flex-basis: 100%; }
+}
+
+.modal-success {
+    display: grid;
+    justify-items: center;
+    gap: 10px;
+    padding: 40px 32px 36px;
+    text-align: center;
+}
+
+.modal-success h3 { font-family: var(--serif); font-size: 2rem; color: var(--navy); }
+.modal-success p { color: var(--muted); max-width: 44ch; }
+.modal-success a { color: var(--gold-dark); font-weight: 600; text-decoration: underline; }
+
+.success-icon {
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #e7f6ec;
+    color: #17633a;
+}
+
+.success-icon svg { width: 30px; height: 30px; stroke-width: 2.4; }
+
+.success-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 14px; }
+
+/* Contact section call-to-action card (the form now lives in the popup) */
+.contact-split .contact-grid { align-items: center; }
+
+.contact-cta {
+    padding: 36px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.contact-cta h3 { font-family: var(--serif); font-size: 1.9rem; margin-bottom: 10px; }
+.contact-cta p { color: rgba(255, 255, 255, 0.75); margin-bottom: 26px; }
+.contact-cta .btn-lg { margin-top: 0; }
+
+@media (max-width: 640px) {
+    .site-modal {
+        width: 100%;
+        max-width: 100%;
+        height: 100%;
+        max-height: 100%;
+        border-radius: 0;
+    }
+    .modal-header { padding: 18px 20px 14px; }
+    .modal-header h2 { font-size: 1.5rem; }
+    .site-modal .enquiry { padding: 20px 20px 28px; }
+    .contact-cta { padding: 26px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .site-modal[open] { animation: none; }
+}
+
+/* Long site name: keep it on one line and leave room for the menu */
+.brand { white-space: nowrap; }
+
+.brand-by {
+    margin-left: 0.35em;
+    font-size: 0.6em;
+    font-weight: 600;
+    font-style: italic;
+    letter-spacing: 0.02em;
+    color: var(--gold);
+}
+
+@media (max-width: 1000px) and (min-width: 861px) {
+    .nav-links { gap: 18px; }
+    .nav-links a { font-size: 0.85rem; }
+    .brand { font-size: 1.3rem; }
+}
+
+@media (max-width: 480px) {
+    .brand { font-size: 1.15rem; gap: 8px; }
+    .brand-mark { width: 32px; height: 32px; font-size: 0.85rem; }
+}
+
+@media (max-width: 340px) {
+    .brand { font-size: 1rem; }
 }
 
 @media (max-width: 960px) {

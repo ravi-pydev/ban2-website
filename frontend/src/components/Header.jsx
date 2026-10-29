@@ -1,16 +1,24 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
+import { EnquireButton } from './popups.jsx';
 
 const LINKS = [
   { to: '/#services', label: 'Services' },
   { to: '/#sessions', label: 'Events' },
-  { to: '/#clients', label: 'Clients' },
   { to: '/#process', label: 'Process' },
 ];
 
 export function Brand({ site }) {
+  // "Event & Experience by Ban2" -> main name + smaller "by Ban2"
+  const name = site.site_name;
+  const at = name.lastIndexOf(' by ');
+  const main = at > 0 ? name.slice(0, at) : name;
+  const by = at > 0 ? name.slice(at + 1) : '';
   return (
-    <Link to="/" className="brand"><span className="brand-mark">B2</span>{site.site_name}</Link>
+    <Link to="/" className="brand" aria-label={name}>
+      <span className="brand-mark">B2</span>
+      <span className="brand-name">{main}{by && <small className="brand-by">{by}</small>}</span>
+    </Link>
   );
 }
 
@@ -44,8 +52,9 @@ export default function Header({ site }) {
           {LINKS.map((link) => (
             <li key={link.to}><Link to={link.to} onClick={close}>{link.label}</Link></li>
           ))}
+          <li><NavLink to="/reviews/" onClick={close}>Reviews</NavLink></li>
           <li><NavLink to="/about/" onClick={close}>About Me</NavLink></li>
-          <li><Link to="/#contact" className="nav-cta" onClick={close}>Enquire</Link></li>
+          <li><EnquireButton className="nav-cta" onClick={close}>Enquire</EnquireButton></li>
         </ul>
       </nav>
     </header>

@@ -1,4 +1,4 @@
-import Contact from '../components/home/Contact.jsx';
+import Feedback from '../components/home/Feedback.jsx';
 import {
   Clients, CtaBand, Faq, Hero, Intro, Process, Ribbon, Services, Sessions, WhyMe,
 } from '../components/home/sections.jsx';
@@ -24,9 +24,9 @@ export default function Home({ site }) {
       <WhyMe points={data.why_me} />
       <Process steps={data.process} />
       <Clients testimonials={data.testimonials} clientTypes={data.client_types} />
+      <Feedback />
       <CtaBand cta={data.cta} fallbackImage={data.hero.image} />
       <Faq faqs={data.faqs} />
-      <Contact site={site} services={data.services} />
     </>
   );
 }

@@ -10,9 +10,9 @@ function niceDate(value) {
 }
 
 /** Build a wa.me link with the enquiry pre-written as a WhatsApp message. */
-export function whatsappUrl(number, data) {
+export function whatsappUrl(number, siteName, data) {
   const text = [
-    '*New event enquiry – Ban2Plans* 🎉',
+    `*New event enquiry – ${siteName}* 🎉`,
     '',
     `👤 *Name:* ${val(data, 'name')}`,
     `🏢 *Company:* ${val(data, 'company')}`,
@@ -21,11 +21,12 @@ export function whatsappUrl(number, data) {
     `🎯 *Event type:* ${val(data, 'event_type')}`,
     `👥 *Guests:* ${val(data, 'guests')}`,
     `📅 *Preferred date:* ${niceDate(data.date)}`,
+    `📍 *Event location:* ${val(data, 'event_location')}`,
     '',
     '📝 *Details:*',
     val(data, 'message'),
     '',
-    '— Sent from the Ban2Plans website',
+    `— Sent from the ${siteName} website`,
   ].join('\n');
   return `https://wa.me/${number}?text=${encodeURIComponent(text)}`;
 }

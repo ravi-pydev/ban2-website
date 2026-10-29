@@ -1,4 +1,4 @@
-"""Database tables for Ban2Plans. Mirrors the MySQL schema in docs/sqls/*.sql."""
+"""Database tables for Event & Experience by Ban2. Mirrors the MySQL schema in docs/sqls/*.sql."""
 
 from django.db import models
 from django.db.models import Q
@@ -145,9 +145,19 @@ class EventSession(TimeStamped):
 
 
 class Testimonial(TimeStamped):
+    class Source(models.TextChoices):
+        ADMIN = 'admin', 'Added in admin'
+        WEBSITE = 'website', 'Feedback form'
+
     event_session = models.ForeignKey(
         EventSession, null=True, blank=True, on_delete=models.SET_NULL, related_name='testimonials')
     client_name = models.CharField(max_length=100)
+    client_email = models.EmailField(
+        max_length=254, blank=True, db_default='',
+        db_comment='Reviewer contact, never shown on the site')
+    source = models.CharField(
+        max_length=20, choices=Source.choices, default=Source.ADMIN, db_default=Source.ADMIN,
+        db_comment='admin = added by the owner, website = submitted through the feedback form')
     client_role = models.CharField(max_length=100, blank=True, db_comment='Designation')
     company = models.CharField(max_length=150, blank=True)
     quote = models.TextField()
@@ -164,6 +174,7 @@ class Testimonial(TimeStamped):
         ordering = ['sort_order', 'id']
         indexes = [
             models.Index(fields=['is_published', 'sort_order'], name='ix_testimonials_pub_order'),
+            models.Index(fields=['is_published', '-rating'], name='ix_testimonials_pub_rating'),
         ]
         constraints = [
             models.CheckConstraint(condition=Q(rating__gte=1, rating__lte=5),
@@ -404,6 +415,8 @@ class Enquiry(TimeStamped):
         max_length=120, db_comment='As chosen on the form, kept even if the service is renamed')
     guests = models.PositiveIntegerField(null=True, blank=True)
     preferred_date = models.DateField(null=True, blank=True)
+    event_location = models.CharField(
+        max_length=150, blank=True, db_comment='City or venue where the event will be held')
     message = models.TextField(blank=True)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.NEW)
     source = models.CharField(max_length=30, default='website')

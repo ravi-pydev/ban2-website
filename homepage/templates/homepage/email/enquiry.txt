@@ -1,6 +1,6 @@
 {% autoescape off %}Hello Shashi,
 
-You have a new event enquiry from the Ban2Plans website.
+You have a new event enquiry from the {{ site_name }} website.
 
 ──────────────────────────────
 ENQUIRY DETAILS
@@ -12,6 +12,7 @@ Phone/WhatsApp  : {{ e.phone|default:"–" }}
 Event type      : {{ e.event_type }}
 Guests          : {{ e.guests|default:"–" }}
 Preferred date  : {% if e.date %}{{ e.date|date:"j M Y" }}{% else %}–{% endif %}
+Event location  : {{ e.event_location|default:"–" }}
 
 Details:
 {{ e.message|default:"–" }}
@@ -19,6 +20,6 @@ Details:
 
 Reply to this email to respond to {{ e.name }} directly.
 
-— Ban2Plans website
+— {{ site_name }} website
 Received: {{ received|date:"j M Y, g:i A" }}
 {% endautoescape %}

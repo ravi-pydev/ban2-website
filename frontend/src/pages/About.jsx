@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { EnquireButton } from '../components/popups.jsx';
 import Icon from '../components/Icon.jsx';
 import { SectionHead, Stats, Tags } from '../components/common.jsx';
 import { PageError, PageLoader } from '../components/Status.jsx';
@@ -16,7 +16,7 @@ function AboutHero({ profile, stats }) {
           <p className="hero-title">{profile.title} <em>· Hospitality, Sales &amp; Events</em></p>
           <p className="hero-summary">{profile.summary}</p>
           <div className="hero-actions">
-            <Link to="/#contact" className="btn btn-primary">Plan an event with me</Link>
+            <EnquireButton>Plan an event with me</EnquireButton>
             <a href="#experience" className="btn btn-ghost">View experience</a>
           </div>
         </div>
@@ -151,7 +151,7 @@ function AboutContact({ profile }) {
           <ContactCard icon="pin" label="Location" value={profile.location} />
           {profile.dob && <ContactCard icon="cake" label="Date of birth" value={profile.dob} />}
         </ul>
-        <Link to="/#contact" className="btn btn-primary btn-lg">Send an enquiry</Link>
+        <EnquireButton className="btn btn-primary btn-lg">Send an enquiry</EnquireButton>
       </div>
     </section>
   );

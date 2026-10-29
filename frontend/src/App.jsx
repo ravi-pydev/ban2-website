@@ -1,4 +1,5 @@
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
+import { PopupProvider } from './components/popups.jsx';
 import Footer from './components/Footer.jsx';
 import Header from './components/Header.jsx';
 import { IconSprite } from './components/Icon.jsx';
@@ -6,6 +7,7 @@ import { PageError, PageLoader } from './components/Status.jsx';
 import { useApi } from './hooks.js';
 import About from './pages/About.jsx';
 import Home from './pages/Home.jsx';
+import ReviewsPage from './pages/Reviews.jsx';
 
 export default function App() {
   return (
@@ -23,17 +25,18 @@ function Layout() {
   if (!site) return <main id="top"><PageLoader /></main>;
 
   return (
-    <>
+    <PopupProvider site={site}>
       <Header site={site} />
       <main id="top">
         <Routes>
           <Route path="/" element={<Home site={site} />} />
           <Route path="/about" element={<About site={site} />} />
+          <Route path="/reviews" element={<ReviewsPage site={site} />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
       <Footer site={site} />
-    </>
+    </PopupProvider>
   );
 }
 

@@ -1,4 +1,4 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 
 from . import models
 
@@ -34,8 +34,29 @@ class EventSessionAdmin(admin.ModelAdmin):
 
 @admin.register(models.Testimonial)
 class TestimonialAdmin(admin.ModelAdmin):
-    list_display = ['client_name', 'company', 'rating', 'consent_given', 'is_published']
-    list_filter = ['is_published', 'consent_given']
+    list_display = ['client_name', 'company', 'rating', 'source', 'consent_given', 'is_published',
+                    'received_on']
+    list_filter = ['is_published', 'source', 'consent_given', 'rating']
+    search_fields = ['client_name', 'company', 'client_email', 'quote']
+    ordering = ['is_published', '-created_at']
+    actions = ['publish', 'unpublish']
+
+    @admin.action(description='Publish selected reviews (only those with client consent)')
+    def publish(self, request, queryset):
+        no_consent = queryset.filter(consent_given=False).count()
+        published = queryset.filter(consent_given=True).update(is_published=True)
+        self.message_user(request, f'{published} review(s) published.', messages.SUCCESS)
+        if no_consent:
+            self.message_user(
+                request,
+                f'{no_consent} review(s) skipped: the client did not agree to be quoted. '
+                'Ask them first, then tick "Consent given".',
+                messages.WARNING)
+
+    @admin.action(description='Unpublish selected reviews')
+    def unpublish(self, request, queryset):
+        count = queryset.update(is_published=False)
+        self.message_user(request, f'{count} review(s) hidden from the site.', messages.SUCCESS)
 
 
 @admin.register(models.Faq)
@@ -90,9 +111,10 @@ class EnquiryFollowupInline(admin.StackedInline):
 
 @admin.register(models.Enquiry)
 class EnquiryAdmin(admin.ModelAdmin):
-    list_display = ['name', 'event_type', 'guests', 'preferred_date', 'status', 'created_at']
-    list_filter = ['status', 'event_type']
-    search_fields = ['name', 'email', 'company', 'message']
+    list_display = ['name', 'event_type', 'event_location', 'guests', 'preferred_date', 'status',
+                    'email_sent', 'created_at']
+    list_filter = ['status', 'event_type', 'email_sent']
+    search_fields = ['name', 'email', 'company', 'event_location', 'message']
     date_hierarchy = 'created_at'
     readonly_fields = ['created_at', 'updated_at', 'ip_address', 'user_agent', 'email_sent']
     inlines = [EnquiryFollowupInline]

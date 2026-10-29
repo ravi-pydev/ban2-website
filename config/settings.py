@@ -35,7 +35,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
-    " 192.168.1.43",
+    "192.168.1.43",
 ]
 
 # Application definition
@@ -201,7 +201,8 @@ else:
         },
     }
 
-DEFAULT_FROM_EMAIL = f'Ban2Plans Website <{_smtp_user or "webmaster@localhost"}>'
+# The display name is replaced by the site name from the database when sending enquiries.
+DEFAULT_FROM_EMAIL = f'Event & Experience by Ban2 Website <{_smtp_user or "webmaster@localhost"}>'
 
 # Where enquiry form submissions are delivered.
 ENQUIRY_EMAIL_TO = os.environ.get('ENQUIRY_EMAIL_TO', 'ravidarshan95@gmail.com')
@@ -220,6 +221,7 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_THROTTLE_RATES': {
         'enquiries': '30/hour',
+        'feedback': '10/hour',
     },
 }
 

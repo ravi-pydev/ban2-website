@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom';
+import Carousel from '../Carousel.jsx';
 import Icon from '../Icon.jsx';
 import { SectionHead, Stats, Tags } from '../common.jsx';
+import { EnquireButton } from '../popups.jsx';
+import { Stars } from './Reviews.jsx';
 
 export function Hero({ hero, profile, stats }) {
   return (
@@ -11,7 +14,7 @@ export function Hero({ hero, profile, stats }) {
           <h1>{hero.heading}</h1>
           <p className="biz-hero-text">{hero.text}</p>
           <div className="hero-actions">
-            <a href="#contact" className="btn btn-primary">{hero.button || 'Plan my event'}</a>
+            <EnquireButton>{hero.button || 'Plan my event'}</EnquireButton>
             <a href="#services" className="btn btn-ghost">Explore services</a>
           </div>
         </div>
@@ -84,7 +87,7 @@ export function Services({ services }) {
               <div className="service-body">
                 <h3>{s.title}</h3>
                 <p>{s.text}</p>
-                <a href="#contact" className="text-link">Enquire <Icon name="arrow" /></a>
+                <EnquireButton eventType={s.title} className="text-link">Enquire <Icon name="arrow" /></EnquireButton>
               </div>
             </article>
           ))}
@@ -156,12 +159,13 @@ export function Clients({ testimonials, clientTypes }) {
     <section id="clients" className="section section-alt">
       <div className="container">
         <SectionHead center kicker="Testimonials" title="Happy Clients" sub="What clients say about working with me." />
-        <div className="testimonial-grid">
+        <div className="reveal">
+        <Carousel label="Happy client testimonials">
           {testimonials.map((t, i) => (
-            <figure key={i} className="testimonial reveal">
+            <figure key={i} className="testimonial">
               {t.sample && <span className="sample-tag">Sample</span>}
               <Icon name="quote" className="quote-mark" />
-              <div className="stars" aria-label={`${t.rating} out of 5`}>{'★'.repeat(t.rating)}</div>
+              <Stars rating={t.rating} />
               <blockquote>{t.quote}</blockquote>
               <figcaption>
                 <span className="avatar"><Icon name="user" /></span>
@@ -169,6 +173,7 @@ export function Clients({ testimonials, clientTypes }) {
               </figcaption>
             </figure>
           ))}
+        </Carousel>
         </div>
         <div className="client-types reveal">
           <p>Trusted by clients across</p>
@@ -188,7 +193,7 @@ export function CtaBand({ cta, fallbackImage }) {
           <h2>{cta.heading}</h2>
           {cta.text && <p>{cta.text}</p>}
         </div>
-        <a href="#contact" className="btn btn-primary btn-lg">{cta.button || 'Get in touch'}</a>
+        <EnquireButton className="btn btn-primary btn-lg">{cta.button || 'Get in touch'}</EnquireButton>
       </div>
     </section>
   );
@@ -202,7 +207,7 @@ export function Faq({ faqs }) {
           <p className="kicker">FAQ</p>
           <h2 className="section-title">Questions clients often ask</h2>
           <p className="lead-text">
-            Can't find what you are looking for? <a href="#contact" className="text-link inline">Send me a message</a>.
+            Can't find what you are looking for? <EnquireButton className="text-link inline">Send me a message</EnquireButton>.
           </p>
         </div>
         <div className="faq reveal">
