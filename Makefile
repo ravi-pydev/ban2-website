@@ -91,3 +91,22 @@ collectstatic:
 
 freeze:
 	$(PIP) freeze > requirements.txt
+
+
+
+# Local settings and secrets. This file is git-ignored — never commit it.
+
+# --- Database (MySQL) ---------------------------------------------------
+# Remove or comment out DB_NAME to fall back to SQLite.
+DB_HOST=127.0.0.1
+DB_PORT=3306
+# DB_NAME=ban2plans
+DB_USER=root
+DB_PASSWORD=ban21999
+
+# --- Email (Gmail) ------------------------------------------------------
+# Leave EMAIL_HOST_USER empty to print enquiry emails to the console instead.
+# EMAIL_HOST_PASSWORD must be a Google App password: https://myaccount.google.com/apppasswords
+EMAIL_HOST_USER=
+EMAIL_HOST_PASSWORD=
+ENQUIRY_EMAIL_TO=ravidarshan95@gmail.com
