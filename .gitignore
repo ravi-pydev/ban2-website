@@ -21,7 +21,7 @@ frontend/dist/
 .env
 
 # Local docs (SQL schema, seed data, setup logs)
-docs/
+#docs/
 
 # IDE / OS
 .vscode/
